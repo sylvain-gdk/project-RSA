@@ -2,6 +2,7 @@
 package project_rsa;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Random;
 
 /**
@@ -11,9 +12,10 @@ import java.util.Random;
 public class project_RSA extends javax.swing.JFrame {
     
     private int rsa;
-    private BigInteger n, z, k, j;
-    private int p, q;
+    private BigInteger p, q, n, z, k, j;
     private static Boolean primeState;
+    BigInteger one = new BigInteger("1");
+    BigInteger two = new BigInteger("2");
 
     /**
      * Creates new form project_RSA_SIM
@@ -25,78 +27,22 @@ public class project_RSA extends javax.swing.JFrame {
     }
     
     /*
-    * @param randNum - a random number in range of min and max
-    * @return primeState - true if the number is prime
-    */
-    public static Boolean isPrime(int randNum){
-        if(randNum%2!=0 && randNum%3!=0 &&randNum%4!=0 && randNum%5!=0 && randNum%6!=0 && randNum%7!=0 && randNum%8!=0 && randNum%9!=0)
-            primeState = true;
-        else primeState = false;
-        
-        return primeState;
-    }
-    
-    /*
-    * @param bits - the RSA in bits
-    * @return randNumPrime - a random prime number in range of min and max
-    */
-    public int randomPrime(int bits){
-        int randNumPrime;
-        do{
-            int min = (int) Math.pow(2, bits-1);
-            int max = (int) Math.pow(2, bits) -1;
-            Random rand = new Random();
-            randNumPrime = rand.nextInt(max - min) + min;
-        }while(isPrime(randNumPrime) == false);
-                
-        return randNumPrime;
-    }
-    
-    /*
-    * THIS FUNCTION IS REPLACED BY BIGINTEGERS.MODINVERSE()
-    * Calculates the inverse of a given integer using the Extended Euclidean Algorithm
-    * First finds the GCD of z (totient) and k (public exponent), then finds the x and y ( GCD = (x*z) + (y*k) )
-    * @param z - the totient value
-    * @param k - the public exponent
-    * @return lastY - the private key
-    */
-    /*public long Ext_Euclidean(long z, long k){
-        long x = 0, y = 1, lastX = 1, lastY = 0, temp;
-        
-        while(k != 0){
-            long quotient = z / k;
-            long remainder = z % k;
-            z = k;
-            k = remainder;
- 
-            temp = x;
-            x = lastX - quotient * x;
-            lastX = temp;
- 
-            temp = y;
-            y = lastY - quotient * y;
-            lastY = temp;
-        }  
-        
-        return lastY;
-    }*/
-    
-    /*
     * Generates public and private keys
     * @param bits - the RSA in bits
     */
     public void generate(int bits){
-    // test if keys work
+        SecureRandom random = new SecureRandom();
+        // test if keys work
         do{
             try{
             // find the modulo and totient
-                p = randomPrime(bits);
-                q = randomPrime(bits);               
-                n = BigInteger.valueOf(p * q);
-                z = BigInteger.valueOf((p-1) * (q-1));
+                p = BigInteger.probablePrime(bits/2, random);
+                q = BigInteger.probablePrime(bits/2, random);
+                n = p.multiply(q);
+                z = p.subtract(one).multiply(q.subtract(one));
                 
             // find a public exponent (prime number k) that is coprime to z (doesn't divise z)
-                k = BigInteger.valueOf(randomPrime(bits));
+                k = new BigInteger("199");
 
             // find the private exponent (congruence relation to k (k * j) % z = 1)
                 // k^-1 % z
@@ -132,7 +78,7 @@ public class project_RSA extends javax.swing.JFrame {
     */
     public Boolean testKeys(){
         Boolean pass;
-        BigInteger two = new BigInteger("2");
+        two = new BigInteger("2");
         String in = String.valueOf(n.subtract(two));
         String out = String.valueOf(this.cypher(in, k, n));
         String compare = String.valueOf(this.cypher(out, j, n));
@@ -627,8 +573,8 @@ public class project_RSA extends javax.swing.JFrame {
         String RSA = jTextField_RSA.getText();
         int bits = Integer.parseInt(RSA);
         this.generate(bits);
-        String prime1 = String.valueOf((long)p);
-        String prime2 = String.valueOf((long)q);
+        String prime1 = String.valueOf(p);
+        String prime2 = String.valueOf(q);
         String mod = String.valueOf(n);
         String totient = String.valueOf(z);
         String pubKey = String.valueOf(k);
