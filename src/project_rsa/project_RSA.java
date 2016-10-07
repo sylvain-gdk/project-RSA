@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 /**
- * This program does RSA encryption
+ * This program uses RSA encryption to scramble text
  * @author sylvain Goedike
  */
 public class project_RSA extends javax.swing.JFrame {
@@ -42,7 +42,7 @@ public class project_RSA extends javax.swing.JFrame {
                 z = p.subtract(one).multiply(q.subtract(one));
                 
             // find a public exponent (prime number k) that is coprime to z (doesn't divise z)
-                k = new BigInteger("199");
+                k = BigInteger.probablePrime(bits/2, random);
 
             // find the private exponent (congruence relation to k (k * j) % z = 1)
                 // k^-1 % z
@@ -51,40 +51,78 @@ public class project_RSA extends javax.swing.JFrame {
             }catch(ArithmeticException | NullPointerException e){
                 jTextArea_log.append(this.log("ERROR ", String.valueOf(e)));
             }
-        }while(this.testKeys() == false);
+        }while((k.gcd(z).equals(BigInteger.ONE) == false));
         
-        jLabel_n_modulo.setText(String.valueOf(n));                      
-        jLabel_k_exponent.setText(String.valueOf(k));       
-        jLabel_j_private_key.setText(String.valueOf(j));
+        String prime1 = String.valueOf(p);
+        String prime2 = String.valueOf(q);
+        String mod = String.valueOf(n);
+        String totient = String.valueOf(z);
+        String pubKey = String.valueOf(k);
+        String privKey = String.valueOf(j);
+        
+        jTextArea_log.append("\n\n---- Begin RSA Public Key of " + bits + "-Bits ----\n\n");       
+        jTextArea_log.append(this.log("1st random p = ", prime1));       
+        jTextArea_log.append(this.log("2nd random q = ", prime2));
+        jTextArea_log.append("modulo n = (" + prime1 + " x " + prime2 + ")" + this.log(" = ", mod));       
+        jTextArea_log.append("totient z = ((" + prime1 + "-1) x (" + prime2 + "-1))" + this.log(" = ", totient));       
+        jTextArea_log.append(this.log("public key exponent (coprime to z) = ", pubKey)); 
+        jTextArea_log.append(this.log("private key exponent (inverse of public) = ", privKey));   
+        jTextArea_log.append("verify = (" + pubKey + " x " + privKey + ") mod" + totient + " = 1\n\n"); 
+        
+        jLabel_n_modulo.setText(mod);                      
+        jLabel_k_exponent.setText(pubKey);       
+        jLabel_j_private_key.setText(privKey);
     }
      
     /*
-    * Encrypts or decrypts the message using the appropriate keys ( messageIn^exponent % n = messageOut )
-    * @param messageIn - the message in
-    * @param exponent - the exponent key
+    * Encrypts the message using the appropriate keys ( messageIn^exponent % n = messageOut )
+    * @param messageIn - the message in plain text
+    * @param exponent - the public exponent key
     * @param n - the modulo
-    * @return messageOut - the message out
+    * @return messageOut - the encrypted message
     */
-    public BigInteger cypher(String messageIn, BigInteger exponent, BigInteger n){
-        BigInteger message = new BigInteger(messageIn);
+    public BigInteger cypherE(String messageIn, BigInteger exponent, BigInteger n){
+        byte[] encode = messageIn.getBytes();
+        BigInteger message = new BigInteger(1, encode);
         BigInteger messageOut = message.modPow(exponent, n);
+        
+        String pubKey = String.valueOf(exponent);       
+        String mod = String.valueOf(n);
+        jTextArea_log.append("------- Begin Encryption -------\n\n");       
+        jTextArea_log.append(this.log("plain text message = ", messageIn)); 
+        jTextArea_log.append(this.log("encoded text message = ", String.valueOf(message)));       
+        jTextArea_log.append(this.log("public exponent = ", pubKey));       
+        jTextArea_log.append(this.log("modulo =  ", mod));       
+        jTextArea_log.append("verify = (" + message + " ^ " + pubKey + ") mod" + mod + " = " + messageOut + "\n\n");
+        jTextArea_log.append(this.log("encrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Encryption --------\n\n"); 
+        
+        jTextField_j_private_key_try.setText(String.valueOf(j));
         
         return messageOut;       
     }
     
     /*
-    * Test if both pulic and private keys are valid
-    * @return pass - true if valid
+    * Decrypts the message using the appropriate keys ( messageIn^exponent % n = messageOut )
+    * @param messageIn - the message to decrypt
+    * @param exponent - the private exponent key
+    * @param n - the modulo
+    * @return messageOut - the message in its original state
     */
-    public Boolean testKeys(){
-        Boolean pass;
-        two = new BigInteger("2");
-        String in = String.valueOf(n.subtract(two));
-        String out = String.valueOf(this.cypher(in, k, n));
-        String compare = String.valueOf(this.cypher(out, j, n));
-        pass = (k.gcd(z).equals(BigInteger.ONE) && in.equals(compare));
+    public String cypherP(BigInteger messageIn, BigInteger exponent, BigInteger n){
+        BigInteger decode = messageIn.modPow(exponent, n);
+        String messageOut = new String(decode.toByteArray());  
+
+        String privKey = String.valueOf(exponent);
+        String mod = String.valueOf(n);
+        jTextArea_log.append("------- Begin Decryption -------\n\n");       
+        jTextArea_log.append(this.log("encrypted message = ", String.valueOf(messageIn)));
+        jTextArea_log.append(this.log("decoded text message = ", String.valueOf(decode)));              
+        jTextArea_log.append(this.log("private exponent = ", privKey));       
+        jTextArea_log.append(this.log("modulo =  ", mod)); 
+        jTextArea_log.append("verify = (" + String.valueOf(messageIn) + " ^ " + privKey + ") mod" + mod + " = " + decode + "\n\n");
+        jTextArea_log.append(this.log("decrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Decryption --------\n\n");
         
-        return pass;
+        return messageOut;       
     }
     
     /*
@@ -572,21 +610,7 @@ public class project_RSA extends javax.swing.JFrame {
     private void jButton_generateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_generateActionPerformed
         String RSA = jTextField_RSA.getText();
         int bits = Integer.parseInt(RSA);
-        this.generate(bits);
-        String prime1 = String.valueOf(p);
-        String prime2 = String.valueOf(q);
-        String mod = String.valueOf(n);
-        String totient = String.valueOf(z);
-        String pubKey = String.valueOf(k);
-        String privKey = String.valueOf(j);
-        jTextArea_log.append("\n\n--- BEGIN RSA ALGORITHM OF " + bits + "-BITS ---\n\n");       
-        jTextArea_log.append(this.log("1st random prime = ", prime1));       
-        jTextArea_log.append(this.log("2nd random prime = ", prime2));
-        jTextArea_log.append("modulo = (" + prime1 + " x " + prime2 + ")" + this.log(" = ", mod));       
-        jTextArea_log.append("totient = ((" + prime1 + "-1) x (" + prime2 + "-1))" + this.log(" = ", totient));       
-        jTextArea_log.append(this.log("public exponent (random and coprime to totient) = ", pubKey)); 
-        jTextArea_log.append(this.log("private exponent (inverse of public exponent) = ", privKey));   
-        jTextArea_log.append("verify = (" + pubKey + " x " + privKey + ") mod" + totient + " = 1\n\n");       
+        this.generate(bits);      
     }//GEN-LAST:event_jButton_generateActionPerformed
 
     private void jTextField_RSAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_RSAActionPerformed
@@ -599,36 +623,18 @@ public class project_RSA extends javax.swing.JFrame {
 
     private void jButton_encryptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_encryptionActionPerformed
         String messageIn = jTextField_P_message_plain.getText();
-        //BigInteger P = BigInteger.valueOf(messageIn); 
-        BigInteger E = this.cypher(messageIn, k, n);
+        BigInteger E = this.cypherE(messageIn, k, n);
         String messageEncrypted = String.valueOf(E);
-        jLabel_E_message_crypted.setText(messageEncrypted);
-        String mod = String.valueOf(n);
-        String pubKey = String.valueOf(k);
-        jTextArea_log.append("------- Begin Encryption -------\n\n");       
-        jTextArea_log.append(this.log("plain text message = ", messageIn));       
-        jTextArea_log.append(this.log("public exponent = ", pubKey));       
-        jTextArea_log.append(this.log("modulo =  ", mod));       
-        jTextArea_log.append("verify = (" + messageIn + " ^ " + pubKey + ") mod" + mod + " = " + messageEncrypted + "\n\n");
-        jTextArea_log.append(this.log("encrypted message =  ", messageEncrypted) + "\n-------- End Encryption --------\n\n");       
+        jLabel_E_message_crypted.setText(messageEncrypted);      
     }//GEN-LAST:event_jButton_encryptionActionPerformed
 
     private void jButton_decryptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_decryptionActionPerformed
         String privateKey = jTextField_j_private_key_try.getText();
-        String crypted = jLabel_E_message_crypted.getText();
-        //long E = Long.parseLong(crypted);
+        BigInteger messageIn = new BigInteger(jLabel_E_message_crypted.getText());
         BigInteger J = new BigInteger(privateKey);
-        BigInteger P = this.cypher(crypted, J, n);
+        String P = this.cypherP(messageIn, J, n);
         String messageDecrypted = String.valueOf(P);
         jLabel_P_message_decrypted.setText(messageDecrypted);
-        String privKey = String.valueOf(J);
-        String mod = String.valueOf(n);
-        jTextArea_log.append("------- Begin Decryption -------\n\n");       
-        jTextArea_log.append(this.log("encrypted message = ", crypted));       
-        jTextArea_log.append(this.log("private exponent = ", privKey));       
-        jTextArea_log.append(this.log("modulo =  ", mod)); 
-        jTextArea_log.append("verify = (" + crypted + " ^ " + privKey + ") mod" + mod + " = " + messageDecrypted + "\n\n");
-        jTextArea_log.append(this.log("decrypted message =  ", messageDecrypted) + "\n-------- End Decryption --------\n\n");
     }//GEN-LAST:event_jButton_decryptionActionPerformed
 
     /**
