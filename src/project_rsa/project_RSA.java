@@ -66,7 +66,7 @@ public class project_RSA extends javax.swing.JFrame {
                 j = k.modInverse(z);
                 
             }catch(ArithmeticException | NullPointerException e){
-                jTextArea_log.append(this.log("Null Pointer ERROR: ", String.valueOf(e)));
+                jTextArea_log.append("Null Pointer ERROR: " + String.valueOf(e) + "\n\n");
             }
         }while((k.gcd(z).equals(BigInteger.ONE) == false));
         
@@ -74,12 +74,12 @@ public class project_RSA extends javax.swing.JFrame {
         this.pushKeysToFile(output);
                
         jTextArea_log.append("\n\n---- Begin RSA Public Key of " + bits + "-Bits ----\n\n");       
-        jTextArea_log.append(this.log("1st random p = ", String.valueOf(p)));       
-        jTextArea_log.append(this.log("2nd random q = ", String.valueOf(q)));
-        jTextArea_log.append(this.log("modulo n = ", String.valueOf(n)));       
-        jTextArea_log.append(this.log("totient z = ", String.valueOf(z)));       
-        jTextArea_log.append(this.log("public key exponent (coprime to z) = ", String.valueOf(k))); 
-        jTextArea_log.append(this.log("private key exponent (inverse of public) = ", String.valueOf(j) + "\n\n"));   
+        jTextArea_log.append(this.log("1st random p = ", String.valueOf(p), this.digiCount(p)));       
+        jTextArea_log.append(this.log("2nd random q = ", String.valueOf(q), this.digiCount(q)));
+        jTextArea_log.append(this.log("modulo n = ", String.valueOf(n), this.digiCount(n)));       
+        jTextArea_log.append(this.log("totient z = ", String.valueOf(z), this.digiCount(z)));       
+        jTextArea_log.append(this.log("public key exponent (coprime to z) = ", String.valueOf(k), this.digiCount(k))); 
+        jTextArea_log.append(this.log("private key exponent (inverse of public) = ", String.valueOf(j), this.digiCount(p)) + "\n\n");   
     }
      
     /**
@@ -93,11 +93,11 @@ public class project_RSA extends javax.swing.JFrame {
         BigInteger messageOut = message.modPow(k, n);
 
         jTextArea_log.append("------- Begin Encryption -------\n\n");       
-        jTextArea_log.append(this.log("plain text message = ", messageIn)); 
-        jTextArea_log.append(this.log("encoded text message = ", String.valueOf(message)));       
-        jTextArea_log.append(this.log("public exponent = ", String.valueOf(k)));       
-        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n)));       
-        jTextArea_log.append(this.log("encrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Encryption --------\n\n");        
+        jTextArea_log.append(this.log("plain text message = ", messageIn, "")); 
+        jTextArea_log.append(this.log("encoded text message = ", String.valueOf(message), this.digiCount(message)));       
+        jTextArea_log.append(this.log("public exponent = ", String.valueOf(k), this.digiCount(k)));       
+        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n), this.digiCount(n)));       
+        jTextArea_log.append(this.log("encrypted message =  ", String.valueOf(messageOut), this.digiCount(messageOut)) + "\n-------- End Encryption --------\n\n");        
                 
         return messageOut;       
     }
@@ -112,28 +112,33 @@ public class project_RSA extends javax.swing.JFrame {
         String messageOut = new String(decode.toByteArray());
 
         jTextArea_log.append("------- Begin Decryption -------\n\n");       
-        jTextArea_log.append(this.log("encrypted message = ", String.valueOf(messageIn)));
-        jTextArea_log.append(this.log("decoded text message = ", String.valueOf(decode)));              
-        jTextArea_log.append(this.log("private exponent = ", String.valueOf(j)));       
-        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n))); 
-        jTextArea_log.append(this.log("decrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Decryption --------\n\n");
+        jTextArea_log.append(this.log("encrypted message = ", String.valueOf(messageIn), this.digiCount(messageIn)));
+        jTextArea_log.append(this.log("decoded text message = ", String.valueOf(decode), this.digiCount(decode)));              
+        jTextArea_log.append(this.log("private exponent = ", String.valueOf(j), this.digiCount(j)));       
+        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n), this.digiCount(n))); 
+        jTextArea_log.append(this.log("decrypted message =  ", messageOut, "") + "\n-------- End Decryption --------\n\n");
         
         return messageOut;       
     }
        
     /**
     * Adds a string to the log
-    * @param name info about the string to append
-    * @param a a string to append
+    * @param name the label
+    * @param num the number
+    * @param count the amount of digits in the number
     * @return logString - the string that will be added to the log
     */
-    public String log(String name, String a){
+    public String log(String name, String num, String count){
         StringBuilder logString = new StringBuilder();
-        String nextLine = "\n\n";
+        String singleLine = "\n";
+        String doubleLine = "\n\n";
         logString.append(name);
-        logString.append(a);
-        logString.append(nextLine);
-        
+        logString.append(num);
+        logString.append(singleLine);
+        logString.append("number of digits: ");
+        logString.append(count);
+        logString.append(doubleLine);
+       
         return logString.toString();       
     }
     
@@ -162,10 +167,10 @@ public class project_RSA extends javax.swing.JFrame {
                 result = (String)contents.getTransferData(DataFlavor.stringFlavor);
             }
             catch (UnsupportedFlavorException fl){
-                jTextArea_log.append(this.log("Unsupported Flavor ERROR =  ", String.valueOf(fl)));
+                jTextArea_log.append("Unsupported Flavor ERROR =  " + String.valueOf(fl) + "\n\n");
             }
             catch (IOException io){
-                jTextArea_log.append(this.log("IO ERROR =  ", String.valueOf(io)));
+                jTextArea_log.append("IO ERROR =  " + String.valueOf(io) + "\n\n");
             }            
         }
         return result;
@@ -183,7 +188,7 @@ public class project_RSA extends javax.swing.JFrame {
             return output;
             
         }catch(IOException e){
-            jTextArea_log.append(this.log("IO ERROR = can't create file at ", String.valueOf(filePath)));
+            jTextArea_log.append("IO ERROR = can't create file at " + String.valueOf(filePath) + "\n\n");
         }
         return null;
     }
@@ -199,7 +204,7 @@ public class project_RSA extends javax.swing.JFrame {
             output.writeUTF(String.valueOf(n) + "|");
             output.close();
         }catch (IOException io){
-            jTextArea_log.append(this.log("IO ERROR = can't write to file ", String.valueOf(filePath)));
+            jTextArea_log.append("IO ERROR = can't write to file " + String.valueOf(filePath) + "\n\n");
         }
     }
     
@@ -220,7 +225,7 @@ public class project_RSA extends javax.swing.JFrame {
            
             input.close();
         }catch(IOException e){
-            jTextArea_log.append(this.log("IO ERROR = can't read from file: ", String.valueOf(filePath)));
+            jTextArea_log.append("IO ERROR = can't read from file: " + String.valueOf(filePath) + "\n\n)");
             found = false;
         }
         if(found == true){
@@ -233,6 +238,17 @@ public class project_RSA extends javax.swing.JFrame {
         }else {
             jTextArea_log.append("Please locate the file privateKey.dat\n");
         }
+    }
+    
+    /**
+     * 
+     * @param num the Big Integer to analyse
+     * @return count - the amount of digits in the Big integer
+     */
+    public String digiCount(BigInteger num){
+        int count = String.valueOf(num).length();
+        
+        return String.valueOf(count);
     }
     
     /**
@@ -491,8 +507,8 @@ public class project_RSA extends javax.swing.JFrame {
             jPanel_logLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel_logLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jScrollPane_log, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addComponent(jScrollPane_log, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .addGap(14, 14, 14))
         );
 
         jTextField_path.addActionListener(new java.awt.event.ActionListener() {
@@ -520,57 +536,52 @@ public class project_RSA extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(39, 39, 39)
+                .addContainerGap(39, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addComponent(jLabel_log, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel_log, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(22, 22, 22)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel_path)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField_path, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton_open, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel_log, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel_log, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jPanel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jPanel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(39, 39, 39))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                .addContainerGap(18, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel_path))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton_open)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jButton_open)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jPanel_decryption, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel_encryption, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel_log, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel_log, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel_log, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
