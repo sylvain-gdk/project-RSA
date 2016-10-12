@@ -2,7 +2,7 @@
 This program allows for text encryption using RSA algorithm.
 (Could be used to have an encrypted conversation over email.)
 
-2 people need to have a copy of this program and a copy of the same key file.
+Requirements: 2 people need to have a copy of this program and a copy of the same key file installed on their computers.
 
 1- Set a path to store the key file, named privateKey.dat (i.e. /Users/YOUR_NAME/Documents/privateKey.dat)
 2- If you already have a key installed, start writing your message and encrypt it. Otherwise generate a new key to share.
