@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.JFileChooser" name="jFileChooser">
+      <Properties>
+        <Property name="currentDirectory" type="java.io.File" editor="org.netbeans.beaninfo.editors.FileEditor">
+          <SerializedValue value="-84,-19,0,5,115,114,0,12,106,97,118,97,46,105,111,46,70,105,108,101,4,45,-92,69,14,13,-28,-1,3,0,1,76,0,4,112,97,116,104,116,0,18,76,106,97,118,97,47,108,97,110,103,47,83,116,114,105,110,103,59,120,112,116,0,24,47,85,115,101,114,115,47,83,121,108,118,97,105,110,47,68,111,99,117,109,101,110,116,115,119,2,0,47,120"/>
+        </Property>
+        <Property name="dialogTitle" type="java.lang.String" value="locate privateKey.dat"/>
+        <Property name="fileFilter" type="javax.swing.filechooser.FileFilter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new MyCustomFilter()" type="code"/>
+        </Property>
+      </Properties>
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="RSA Encryption Text Scrambler"/>
@@ -28,26 +41,38 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace pref="39" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel_log" min="-2" pref="97" max="-2" attributes="0"/>
-                  <Component id="jPanel_log" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="jLabel_path" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jTextField_path" min="-2" pref="393" max="-2" attributes="0"/>
+                          <Component id="jButton_open" min="-2" pref="85" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="jPanel_generate" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabel_encryption" min="-2" pref="159" max="-2" attributes="0"/>
-                              <Component id="jPanel_encryption" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jPanel_decryption" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel_decryption" min="-2" pref="153" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="jLabel_log" min="-2" pref="97" max="-2" attributes="0"/>
+                          <Component id="jPanel_log" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel_encryption" min="-2" pref="159" max="-2" attributes="0"/>
+                                  <Component id="jPanel_encryption" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jPanel_decryption" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel_decryption" min="-2" pref="153" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
+                      <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,13 +80,26 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-              <Component id="jPanel_generate" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel_encryption" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                  <Component id="jLabel_decryption" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="jPanel_generate" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jLabel_encryption" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                          <Component id="jLabel_decryption" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jTextField_path" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel_path" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jButton_open" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jPanel_decryption" max="32767" attributes="0"/>
                   <Component id="jPanel_encryption" max="32767" attributes="0"/>
@@ -87,13 +125,13 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
-                  <Component id="jLabel_RSA" min="-2" pref="109" max="-2" attributes="0"/>
+                  <EmptySpace pref="29" max="32767" attributes="0"/>
+                  <Component id="jTextField_RSA" min="-2" pref="54" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jTextField_RSA" min="-2" pref="100" max="-2" attributes="0"/>
+                  <Component id="jLabel_RSA" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jButton_generate" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="17" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -103,8 +141,8 @@
                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel_RSA" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="jTextField_RSA" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                       <Component id="jButton_generate" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextField_RSA" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="18" max="32767" attributes="0"/>
               </Group>
@@ -124,9 +162,18 @@
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="2"/>
-            <Property name="text" type="java.lang.String" value="Nombre de bits:"/>
+            <Property name="text" type="java.lang.String" value="-bits"/>
             <Property name="horizontalTextPosition" type="int" value="4"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton_generate">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Generate Key"/>
+            <Property name="toolTipText" type="java.lang.String" value="Generate"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_generateActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField_RSA">
           <Properties>
@@ -139,15 +186,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextField_RSAActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="jButton_generate">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Generate Key"/>
-            <Property name="toolTipText" type="java.lang.String" value="Generate"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_generateActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -183,7 +221,7 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton_paste1" min="-2" pref="85" max="-2" attributes="0"/>
+                          <Component id="jButton_encryption_paste" min="-2" pref="85" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="58" max="-2" attributes="0"/>
                           <Component id="jButton_encryption" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -201,11 +239,11 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jButton_encryption" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton_decryption" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButton_paste1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButton_encryption_paste" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jScrollPane_encryption_message" min="-2" pref="164" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="11" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -223,6 +261,7 @@
         <Component class="javax.swing.JButton" name="jButton_decryption">
           <Properties>
             <Property name="text" type="java.lang.String" value="Decrypt"/>
+            <Property name="toolTipText" type="java.lang.String" value="Decrypt"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_decryptionActionPerformed"/>
@@ -247,13 +286,13 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="jButton_paste1">
+        <Component class="javax.swing.JButton" name="jButton_encryption_paste">
           <Properties>
             <Property name="text" type="java.lang.String" value="Paste"/>
-            <Property name="toolTipText" type="java.lang.String" value="Encrypt"/>
+            <Property name="toolTipText" type="java.lang.String" value="Paste"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_paste1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_encryption_pasteActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -267,7 +306,7 @@
           <Font name="Lucida Grande" size="24" style="0"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="2"/>
-        <Property name="text" type="java.lang.String" value="D&#xe9;cryption:"/>
+        <Property name="text" type="java.lang.String" value="Decryption:"/>
         <Property name="horizontalTextPosition" type="int" value="4"/>
       </Properties>
     </Component>
@@ -329,7 +368,7 @@
         <Component class="javax.swing.JButton" name="jButton_copy">
           <Properties>
             <Property name="text" type="java.lang.String" value="Copy"/>
-            <Property name="toolTipText" type="java.lang.String" value="Encrypt"/>
+            <Property name="toolTipText" type="java.lang.String" value="Copy"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_copyActionPerformed"/>
@@ -403,5 +442,32 @@
         </Container>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JTextField" name="jTextField_path">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextField_pathActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel_path">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Lucida Grande" size="14" style="0"/>
+        </Property>
+        <Property name="horizontalAlignment" type="int" value="2"/>
+        <Property name="text" type="java.lang.String" value="Path:"/>
+        <Property name="horizontalTextPosition" type="int" value="4"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton_open">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Browse"/>
+        <Property name="toolTipText" type="java.lang.String" value="Browse"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_openActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

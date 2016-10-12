@@ -7,9 +7,17 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import javax.swing.JFileChooser;
 
 /**
  * This program uses RSA encryption to scramble text
@@ -19,9 +27,9 @@ public class project_RSA extends javax.swing.JFrame {
     
     private int rsa;
     private BigInteger p, q, n, z, k, j;
-    private static Boolean primeState;
-    BigInteger one = new BigInteger("1");
-    BigInteger two = new BigInteger("2");
+    private final BigInteger one = new BigInteger("1");
+    private final BigInteger two = new BigInteger("2");
+    private String filePath = "";
 
     /**
      * Creates new form project_RSA_SIM
@@ -30,6 +38,9 @@ public class project_RSA extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         this.setTitle("RSA Encryption Text Scrambler");
+        jTextArea_log.append("\n\n---- Welcome to RSA Encryption Text Scrambler ----\n"
+                             + "\n\t-- INSTRUCTIONS --\n\n- Start by setting the path to store the privateKey.dat file\n- After setting the path, you can gererate a key if you don't already have one"
+                             + "\n- Write and encrypt your message\n- Copy the encrypted message and send it by email along with the privateKey.dat file as attachement\n\n");
     }
     
     /**
@@ -55,69 +66,56 @@ public class project_RSA extends javax.swing.JFrame {
                 j = k.modInverse(z);
                 
             }catch(ArithmeticException | NullPointerException e){
-                jTextArea_log.append(this.log("ERROR ", String.valueOf(e)));
+                jTextArea_log.append(this.log("Null Pointer ERROR: ", String.valueOf(e)));
             }
         }while((k.gcd(z).equals(BigInteger.ONE) == false));
         
-        String prime1 = String.valueOf(p);
-        String prime2 = String.valueOf(q);
-        String mod = String.valueOf(n);
-        String totient = String.valueOf(z);
-        String pubKey = String.valueOf(k);
-        String privKey = String.valueOf(j);
-        
+        DataOutputStream output = writeFile();
+        this.pushKeysToFile(output);
+               
         jTextArea_log.append("\n\n---- Begin RSA Public Key of " + bits + "-Bits ----\n\n");       
-        jTextArea_log.append(this.log("1st random p = ", prime1));       
-        jTextArea_log.append(this.log("2nd random q = ", prime2));
-        jTextArea_log.append("modulo n = (" + prime1 + " x " + prime2 + ")" + this.log(" = ", mod));       
-        jTextArea_log.append("totient z = ((" + prime1 + "-1) x (" + prime2 + "-1))" + this.log(" = ", totient));       
-        jTextArea_log.append(this.log("public key exponent (coprime to z) = ", pubKey)); 
-        jTextArea_log.append(this.log("private key exponent (inverse of public) = ", privKey));   
-        jTextArea_log.append("verify = (" + pubKey + " x " + privKey + ") mod" + totient + " = 1\n\n"); 
+        jTextArea_log.append(this.log("1st random p = ", String.valueOf(p)));       
+        jTextArea_log.append(this.log("2nd random q = ", String.valueOf(q)));
+        jTextArea_log.append(this.log("modulo n = ", String.valueOf(n)));       
+        jTextArea_log.append(this.log("totient z = ", String.valueOf(z)));       
+        jTextArea_log.append(this.log("public key exponent (coprime to z) = ", String.valueOf(k))); 
+        jTextArea_log.append(this.log("private key exponent (inverse of public) = ", String.valueOf(j) + "\n\n"));   
     }
      
     /**
     * Encrypts the message using the appropriate keys ( messageIn^exponent % n = messageOut )
     * @param messageIn the message in plain text
-    * @param exponent the public exponent key
-    * @param n the modulo
     * @return messageOut - the encrypted message
     */
-    public BigInteger cypherE(String messageIn, BigInteger exponent, BigInteger n){
+    public BigInteger cypherE(String messageIn){
         byte[] encode = messageIn.getBytes();
         BigInteger message = new BigInteger(1, encode);
-        BigInteger messageOut = message.modPow(exponent, n);
-        
-        String pubKey = String.valueOf(exponent);       
-        String mod = String.valueOf(n);
+        BigInteger messageOut = message.modPow(k, n);
+
         jTextArea_log.append("------- Begin Encryption -------\n\n");       
         jTextArea_log.append(this.log("plain text message = ", messageIn)); 
         jTextArea_log.append(this.log("encoded text message = ", String.valueOf(message)));       
-        jTextArea_log.append(this.log("public exponent = ", pubKey));       
-        jTextArea_log.append(this.log("modulo =  ", mod));       
+        jTextArea_log.append(this.log("public exponent = ", String.valueOf(k)));       
+        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n)));       
         jTextArea_log.append(this.log("encrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Encryption --------\n\n");        
-        
+                
         return messageOut;       
     }
     
     /**
     * Decrypts the message using the appropriate keys ( messageIn^exponent % n = messageOut )
     * @param messageIn the message to decrypt
-    * @param exponent the private exponent key
-    * @param n the modulo
     * @return messageOut - the message in its original state
     */
-    public String cypherP(BigInteger messageIn, BigInteger exponent, BigInteger n){
-        BigInteger decode = messageIn.modPow(exponent, n);
+    public String cypherP(BigInteger messageIn){
+        BigInteger decode = messageIn.modPow(j, n);
         String messageOut = new String(decode.toByteArray());
 
-        String privKey = String.valueOf(exponent);
-        String mod = String.valueOf(n);
         jTextArea_log.append("------- Begin Decryption -------\n\n");       
         jTextArea_log.append(this.log("encrypted message = ", String.valueOf(messageIn)));
         jTextArea_log.append(this.log("decoded text message = ", String.valueOf(decode)));              
-        jTextArea_log.append(this.log("private exponent = ", privKey));       
-        jTextArea_log.append(this.log("modulo =  ", mod)); 
+        jTextArea_log.append(this.log("private exponent = ", String.valueOf(j)));       
+        jTextArea_log.append(this.log("modulo =  ", String.valueOf(n))); 
         jTextArea_log.append(this.log("decrypted message =  ", String.valueOf(messageOut)) + "\n-------- End Decryption --------\n\n");
         
         return messageOut;       
@@ -163,14 +161,97 @@ public class project_RSA extends javax.swing.JFrame {
             try {
                 result = (String)contents.getTransferData(DataFlavor.stringFlavor);
             }
-            catch (UnsupportedFlavorException | IOException ex){
-                System.out.println(ex);
+            catch (UnsupportedFlavorException fl){
+                jTextArea_log.append(this.log("Unsupported Flavor ERROR =  ", String.valueOf(fl)));
             }
+            catch (IOException io){
+                jTextArea_log.append(this.log("IO ERROR =  ", String.valueOf(io)));
+            }            
         }
         return result;
     } 
-
     
+    /**
+    * Writes the output stream
+    * @return null
+    */
+    public DataOutputStream writeFile(){
+        try{
+            File pKey = new File(filePath);
+            DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(pKey, false)));
+            
+            return output;
+            
+        }catch(IOException e){
+            jTextArea_log.append(this.log("IO ERROR = can't create file at ", String.valueOf(filePath)));
+        }
+        return null;
+    }
+    
+    /**
+     * Writes the key data to file
+     * @param output the data output stream
+     */
+    public void pushKeysToFile(DataOutputStream output){
+        try{
+            output.writeUTF(String.valueOf(k) + "|");
+            output.writeUTF(String.valueOf(j) + "|");
+            output.writeUTF(String.valueOf(n) + "|");
+            output.close();
+        }catch (IOException io){
+            jTextArea_log.append(this.log("IO ERROR = can't write to file ", String.valueOf(filePath)));
+        }
+    }
+    
+    /**
+     * Reads the key data from file
+     */
+    public void getKeysFromFile(){
+        String first = "";
+        String second = "";
+        String third = "";    
+        boolean found = true;
+        try{
+            File pKey = new File(filePath);       
+            DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(pKey)));                       
+            first = input.readUTF();
+            second = input.readUTF();
+            third = input.readUTF();
+           
+            input.close();
+        }catch(IOException e){
+            jTextArea_log.append(this.log("IO ERROR = can't read from file: ", String.valueOf(filePath)));
+            found = false;
+        }
+        if(found == true){
+            BigInteger tmpPubKey = new BigInteger(first.substring(0, first.length()-1));
+            BigInteger tmpPrivKey = new BigInteger(second.substring(0, second.length()-1));
+            BigInteger tmpModulo = new BigInteger(third.substring(0, third.length()-1));
+            k = tmpPubKey;      
+            j = tmpPrivKey;      
+            n = tmpModulo;
+        }else {
+            jTextArea_log.append("Please locate the file privateKey.dat\n");
+        }
+    }
+    
+    /**
+     * Creates a File Chooser for browsing files 
+     */
+    class MyCustomFilter extends javax.swing.filechooser.FileFilter {
+        @Override
+        public boolean accept(File file) {
+            // Allow only directories, or files with ".txt" extension
+            return file.isDirectory() || file.getAbsolutePath().endsWith(".dat");
+        }
+        @Override
+        public String getDescription() {
+            // This description will be displayed in the dialog,
+            // hard-coded = ugly, should be done via I18N
+            return "Text documents (*.dat)";
+        }
+    } 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -180,17 +261,18 @@ public class project_RSA extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser = new javax.swing.JFileChooser();
         jPanel_generate = new javax.swing.JPanel();
         jLabel_RSA = new javax.swing.JLabel();
-        jTextField_RSA = new javax.swing.JTextField();
         jButton_generate = new javax.swing.JButton();
+        jTextField_RSA = new javax.swing.JTextField();
         jLabel_encryption = new javax.swing.JLabel();
         jPanel_encryption = new javax.swing.JPanel();
         jButton_encryption = new javax.swing.JButton();
         jButton_decryption = new javax.swing.JButton();
         jScrollPane_encryption_message = new javax.swing.JScrollPane();
         jTextArea_encryption_message = new javax.swing.JTextArea();
-        jButton_paste1 = new javax.swing.JButton();
+        jButton_encryption_paste = new javax.swing.JButton();
         jLabel_decryption = new javax.swing.JLabel();
         jPanel_decryption = new javax.swing.JPanel();
         jScrollPane_decryption_message = new javax.swing.JScrollPane();
@@ -200,6 +282,13 @@ public class project_RSA extends javax.swing.JFrame {
         jPanel_log = new javax.swing.JPanel();
         jScrollPane_log = new javax.swing.JScrollPane();
         jTextArea_log = new javax.swing.JTextArea();
+        jTextField_path = new javax.swing.JTextField();
+        jLabel_path = new javax.swing.JLabel();
+        jButton_open = new javax.swing.JButton();
+
+        jFileChooser.setCurrentDirectory(new java.io.File("/Users/Sylvain/Documents"));
+        jFileChooser.setDialogTitle("locate privateKey.dat");
+        jFileChooser.setFileFilter(new MyCustomFilter());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("RSA Encryption Text Scrambler");
@@ -211,8 +300,16 @@ public class project_RSA extends javax.swing.JFrame {
         jLabel_RSA.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel_RSA.setForeground(new java.awt.Color(255, 255, 255));
         jLabel_RSA.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel_RSA.setText("Nombre de bits:");
+        jLabel_RSA.setText("-bits");
         jLabel_RSA.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+
+        jButton_generate.setText("Generate Key");
+        jButton_generate.setToolTipText("Generate");
+        jButton_generate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_generateActionPerformed(evt);
+            }
+        });
 
         jTextField_RSA.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jTextField_RSA.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -224,26 +321,18 @@ public class project_RSA extends javax.swing.JFrame {
             }
         });
 
-        jButton_generate.setText("Generate Key");
-        jButton_generate.setToolTipText("Generate");
-        jButton_generate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_generateActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel_generateLayout = new javax.swing.GroupLayout(jPanel_generate);
         jPanel_generate.setLayout(jPanel_generateLayout);
         jPanel_generateLayout.setHorizontalGroup(
             jPanel_generateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel_generateLayout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addComponent(jLabel_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE)
+                .addComponent(jTextField_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel_RSA)
                 .addGap(18, 18, 18)
                 .addComponent(jButton_generate)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addGap(10, 10, 10))
         );
         jPanel_generateLayout.setVerticalGroup(
             jPanel_generateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,8 +340,8 @@ public class project_RSA extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel_generateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton_generate))
+                    .addComponent(jButton_generate)
+                    .addComponent(jTextField_RSA, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -273,6 +362,7 @@ public class project_RSA extends javax.swing.JFrame {
         });
 
         jButton_decryption.setText("Decrypt");
+        jButton_decryption.setToolTipText("Decrypt");
         jButton_decryption.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_decryptionActionPerformed(evt);
@@ -286,11 +376,11 @@ public class project_RSA extends javax.swing.JFrame {
         jTextArea_encryption_message.setRows(5);
         jScrollPane_encryption_message.setViewportView(jTextArea_encryption_message);
 
-        jButton_paste1.setText("Paste");
-        jButton_paste1.setToolTipText("Encrypt");
-        jButton_paste1.addActionListener(new java.awt.event.ActionListener() {
+        jButton_encryption_paste.setText("Paste");
+        jButton_encryption_paste.setToolTipText("Paste");
+        jButton_encryption_paste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_paste1ActionPerformed(evt);
+                jButton_encryption_pasteActionPerformed(evt);
             }
         });
 
@@ -305,7 +395,7 @@ public class project_RSA extends javax.swing.JFrame {
                         .addComponent(jScrollPane_encryption_message, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel_encryptionLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton_paste1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton_encryption_paste, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(58, 58, 58)
                         .addComponent(jButton_encryption)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -319,16 +409,16 @@ public class project_RSA extends javax.swing.JFrame {
                 .addGroup(jPanel_encryptionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton_encryption)
                     .addComponent(jButton_decryption)
-                    .addComponent(jButton_paste1))
+                    .addComponent(jButton_encryption_paste))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane_encryption_message, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         jLabel_decryption.setBackground(new java.awt.Color(255, 255, 255));
         jLabel_decryption.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
         jLabel_decryption.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel_decryption.setText("Décryption:");
+        jLabel_decryption.setText("Decryption:");
         jLabel_decryption.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
 
         jPanel_decryption.setBackground(new java.awt.Color(0, 0, 0));
@@ -341,7 +431,7 @@ public class project_RSA extends javax.swing.JFrame {
         jScrollPane_decryption_message.setViewportView(jTextArea_decryption_message);
 
         jButton_copy.setText("Copy");
-        jButton_copy.setToolTipText("Encrypt");
+        jButton_copy.setToolTipText("Copy");
         jButton_copy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_copyActionPerformed(evt);
@@ -405,37 +495,75 @@ public class project_RSA extends javax.swing.JFrame {
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
+        jTextField_path.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField_pathActionPerformed(evt);
+            }
+        });
+
+        jLabel_path.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel_path.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        jLabel_path.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel_path.setText("Path:");
+        jLabel_path.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+
+        jButton_open.setText("Browse");
+        jButton_open.setToolTipText("Browse");
+        jButton_open.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_openActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(39, Short.MAX_VALUE)
+                .addGap(39, 39, 39)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel_log, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel_log, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel_path)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField_path, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton_open, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jPanel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jPanel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(39, 39, 39))
+                        .addGap(46, 46, 46))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel_log, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel_log, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jPanel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(39, 39, 39))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel_generate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel_encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel_decryption, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextField_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel_path))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton_open)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jPanel_decryption, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel_encryption, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -461,26 +589,47 @@ public class project_RSA extends javax.swing.JFrame {
 
     private void jButton_encryptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_encryptionActionPerformed
         String messageIn = jTextArea_encryption_message.getText();
-        BigInteger E = this.cypherE(messageIn, k, n);
+        BigInteger E = this.cypherE(messageIn);
         String messageEncrypted = String.valueOf(E);
-        jTextArea_decryption_message.setText(messageEncrypted);         
+        jTextArea_decryption_message.setText(messageEncrypted); 
+        jTextArea_encryption_message.setText("");        
     }//GEN-LAST:event_jButton_encryptionActionPerformed
 
     private void jButton_decryptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_decryptionActionPerformed
         BigInteger messageIn = new BigInteger(jTextArea_encryption_message.getText());
-        String P = this.cypherP(messageIn, j, n);
+        String P = this.cypherP(messageIn);
         String messageDecrypted = String.valueOf(P);
         jTextArea_decryption_message.setText(messageDecrypted);
+        jTextArea_encryption_message.setText("");
     }//GEN-LAST:event_jButton_decryptionActionPerformed
 
     private void jButton_copyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_copyActionPerformed
         this.copy(jTextArea_decryption_message.getText());
     }//GEN-LAST:event_jButton_copyActionPerformed
 
-    private void jButton_paste1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_paste1ActionPerformed
-        jTextArea_encryption_message.setText(this.paste());
-    }//GEN-LAST:event_jButton_paste1ActionPerformed
+    private void jButton_openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_openActionPerformed
+        int returnVal = jFileChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser.getSelectedFile();
+            filePath = String.valueOf(file.getAbsolutePath());
+            jTextField_path.setText(filePath);
+            this.getKeysFromFile();
+        jTextArea_log.append("\nFile succesfully loaded.\n");
+        } else {
+            //System.out.println("File access cancelled by user.");
+            jTextArea_log.append("\nFile access was cancelled.\n");
+        }
+    }//GEN-LAST:event_jButton_openActionPerformed
 
+    private void jTextField_pathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_pathActionPerformed
+        // load from file on start up 
+    }//GEN-LAST:event_jTextField_pathActionPerformed
+
+    private void jButton_encryption_pasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_encryption_pasteActionPerformed
+        jTextArea_encryption_message.setText(this.paste());
+
+    }//GEN-LAST:event_jButton_encryption_pasteActionPerformed
+   
     /**
      * @param args the command line arguments
      */
@@ -523,12 +672,15 @@ public class project_RSA extends javax.swing.JFrame {
     private javax.swing.JButton jButton_copy;
     private javax.swing.JButton jButton_decryption;
     private javax.swing.JButton jButton_encryption;
+    private javax.swing.JButton jButton_encryption_paste;
     private javax.swing.JButton jButton_generate;
-    private javax.swing.JButton jButton_paste1;
+    private javax.swing.JButton jButton_open;
+    private javax.swing.JFileChooser jFileChooser;
     private javax.swing.JLabel jLabel_RSA;
     private javax.swing.JLabel jLabel_decryption;
     private javax.swing.JLabel jLabel_encryption;
     private javax.swing.JLabel jLabel_log;
+    private javax.swing.JLabel jLabel_path;
     private javax.swing.JPanel jPanel_decryption;
     private javax.swing.JPanel jPanel_encryption;
     private javax.swing.JPanel jPanel_generate;
@@ -540,5 +692,6 @@ public class project_RSA extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea_encryption_message;
     private javax.swing.JTextArea jTextArea_log;
     private javax.swing.JTextField jTextField_RSA;
+    private javax.swing.JTextField jTextField_path;
     // End of variables declaration//GEN-END:variables
 }
