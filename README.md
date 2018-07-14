@@ -10,9 +10,7 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 - JavaSE Runtime 1.8 (to try the compiled project)
 - 2 people need to have a copy of this program and a copy of the same key file installed on their computers.
 
-## Getting Started
-
-- Download the JAR file and give it a try! [download](https://github.com/sylvain-gdk/project-RSA/tree/master/dist/project_RSA.jar) 
+## Getting Started 
 
 - Set a path to store the key file, named privateKey.dat (i.e. /Users/YOUR_NAME/Documents/privateKey.dat)
 
