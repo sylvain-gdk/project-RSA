@@ -6,9 +6,9 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 
 ## Dependencies
 
--2 people need to have a copy of this program and a copy of the same key file installed on their computers.
 - JavaSDK 1.8
 - JavaSE Runtime 1.8 (to try the compiled project)
+- 2 people need to have a copy of this program and a copy of the same key file installed on their computers.
 
 ## Getting Started
 
@@ -24,8 +24,20 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 
 ## Screenshots
 
-#### 3 users connecting
-!["starting.png"](https://github.com/sylvain-gdk/chatty-app/blob/master/docs/starting.png)
+#### Main screen
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/main.png)
 
-#### Changing name
-!["name-change.png"](https://github.com/sylvain-gdk/chatty-app/blob/master/docs/name-change.png)
+#### Loading a key file
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/load-key.png)
+
+#### Writing a message
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/message.png)
+
+#### Encrypting a message
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/encrypt-message.png)
+
+#### Receiving a message
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/paste-message.png)
+
+#### Decrypting the mesage
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/decrypt-message.png)
