@@ -12,6 +12,8 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 
 ## Getting Started
 
+- Download the JAR file and gice it a try! [a link](https://github.com/sylvain-gdk/project-RSA/tree/master/dist/project_RSA.jar) 
+
 - Set a path to store the key file, named privateKey.dat (i.e. /Users/YOUR_NAME/Documents/privateKey.dat)
 
 - If you already have a key installed, start writing your message and encrypt it. Otherwise generate a new key to share.
@@ -20,15 +22,15 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 
 - The other user will be able to decrypt your message by setting the path to the key file you sent.
 
-- warning: of course, if anyone else has access to your key file, they will also be able to decrypt your messages!
+- _**warning:**_ of course, if anyone else has access to your key file, they will also be able to decrypt your messages!
 
 ## Screenshots
 
 #### Main screen
-!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/main.png)
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/main.PNG)
 
 #### Loading a key file
-!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/load-key.png)
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/load-key.PNG)
 
 #### Writing a message
 !["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/message.png)
@@ -37,7 +39,7 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 !["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/encrypt-message.png)
 
 #### Receiving a message
-!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/paste-message.png)
+!["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/paste-message.PNG)
 
 #### Decrypting the mesage
 !["starting.png"](https://github.com/sylvain-gdk/project-RSA/blob/master/docs/decrypt-message.png)
