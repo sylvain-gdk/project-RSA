@@ -12,7 +12,7 @@ This program allows to encrypt messages using an RSA algorithm. It could be used
 
 ## Getting Started
 
-- Download the JAR file and gice it a try! [a link](https://github.com/sylvain-gdk/project-RSA/tree/master/dist/project_RSA.jar) 
+- Download the JAR file and give it a try! [download](https://github.com/sylvain-gdk/project-RSA/tree/master/dist/project_RSA.jar) 
 
 - Set a path to store the key file, named privateKey.dat (i.e. /Users/YOUR_NAME/Documents/privateKey.dat)
 
